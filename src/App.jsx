@@ -1,7 +1,8 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function App() {
+  console.log("UPDATE");
   const [todos, setTodos] = useState([
     {
       label: "Learn JavaScript",
@@ -17,11 +18,7 @@ function App() {
     },
   ]);
 
-  const [filteredTodos, setfilteredTodos] = useState(todos);
-
   const [statusFilter, setStatusFilter] = useState("All");
-
-  const [activeTodosLength, setActiveTodosLength] = useState();
 
   const changeCheckBox = (todo) => {
     const myTodo = todos.find((td) => td == todo);
@@ -29,45 +26,31 @@ function App() {
     setTodos([...todos]);
   };
 
-  const filterAll = () => {
-    setStatusFilter("All");
-    setfilteredTodos(todos);
-  };
-
-  const filterSelectedTodo = () => {
-    setStatusFilter("Completed");
-
-    const selectedTodos = todos.filter((todo) => todo.isChecked === true);
-
-    setfilteredTodos(selectedTodos);
-  };
-
-  const filterActiveTodo = () => {
-    setStatusFilter("Active");
-
-    const activeTodos = todos.filter((todo) => todo.isChecked === false);
-
-    setfilteredTodos(activeTodos);
-  };
-
   const clearCompletedTodo = () => {
     const activeTodos = todos.filter((todo) => todo.isChecked === false);
     setTodos(activeTodos);
-    setfilteredTodos(todos);
   };
 
   const removeTodo = (todo) => {
     const myTodoIndex = todos.indexOf(todo);
-    todos.splice(myTodoIndex, 1);
+    const newTodos = [...todos];
 
-    setTodos(todos);
-    setfilteredTodos(todos);
+    newTodos.splice(myTodoIndex, 1);
+    setTodos(newTodos);
   };
 
-  useEffect(() => {
-    const activeTodos = todos.filter((todo) => todo.isChecked === false);
-    setActiveTodosLength(activeTodos.length);
-  }, [todos]);
+  const filterFunction = (statusFilter) => {
+    if (statusFilter === "All") {
+      return [...todos];
+    } else if (statusFilter === "Active") {
+      return todos.filter((todo) => todo.isChecked === false);
+    }
+    return todos.filter((todo) => todo.isChecked === true);
+  };
+
+  const filteredTodos = filterFunction(statusFilter);
+  const activeTodosLength = todos.filter((t) => !t.isChecked).length;
+
   return (
     <div>
       <section className="todoapp">
@@ -121,7 +104,7 @@ function App() {
               <a
                 href="#/"
                 className={statusFilter === "All" ? "selected" : ""}
-                onClick={filterAll}
+                onClick={() => setStatusFilter("All")}
               >
                 All
               </a>
@@ -130,7 +113,7 @@ function App() {
               <a
                 href="#/"
                 className={statusFilter === "Active" ? "selected" : ""}
-                onClick={filterActiveTodo}
+                onClick={() => setStatusFilter("Active")}
               >
                 Active
               </a>
@@ -139,7 +122,7 @@ function App() {
               <a
                 href="#/"
                 className={statusFilter === "Completed" ? "selected" : ""}
-                onClick={filterSelectedTodo}
+                onClick={() => setStatusFilter("Completed")}
               >
                 Completed
               </a>
